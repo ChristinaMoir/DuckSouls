@@ -1,0 +1,14 @@
+<div class="jumbotron text-center">
+  <h1>Welcome to DuckSouls</h1>
+
+  <div ng-if="!main.loggedIn">
+    <p>Login or Register to play.</p>
+    <a href="/login" class="btn btn-primary">Login</a>
+    <a href="/users/create" class="btn btn-primary">Register</a>
+  </div>
+
+  <div ng-if="main.loggedIn">
+    <p>Play Game!</p>
+    <a href="/play" class="btn btn-warning">Play</a>
+  </div>
+</div>

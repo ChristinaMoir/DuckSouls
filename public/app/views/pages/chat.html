@@ -1,0 +1,18 @@
+<div id="contentWrap">
+  <div id="game">
+    <canvas id="gameCanvas" width="800" height="512" tabindex="0" ng-click="game.focus($event)" ng-keydown="game.move($event)"></canvas>
+  </div>
+  <div id="chatWrap">
+    <div id="chat" scroll-glue>
+      <ul>
+        <li ng-repeat="message in game.messages"> <strong>{{message.username}} : </strong>{{message.message}}
+        </li>
+      </ul>
+    </div>
+    <form ng-submit="game.newMessage()" id="send-message">
+      <input type="text" id="message" ng-model="game.gameData.message">
+      <input type="submit">
+    </form>
+
+  </div>
+</div>
