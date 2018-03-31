@@ -9,17 +9,17 @@ angular.module('mainCtrl', [])
     // vm.admin = Auth.admin();
 
     // check to see if a user is logged in on every request
-    // $rootScope.$on('$routeChangeStart', function() {
-    //   vm.loggedIn = Auth.isLoggedIn();
-    //   // vm.admin = Auth.admin();
-    //   // get user information on page load
-    //   Auth.getUser()
-    //     .then(function(data) {
-    //       vm.user = data.data;
-    //       console.log(vm.user);
-    //       vm.admin = vm.user.admin;
-    //     });
-    // });
+    $rootScope.$on('$routeChangeStart', function() {
+      vm.loggedIn = Auth.isLoggedIn();
+      // vm.admin = Auth.admin();
+      // get user information on page load
+      Auth.getUser()
+        .then(function(data) {
+          vm.user = data.data;
+          console.log(vm.user);
+          vm.admin = vm.user.admin;
+        });
+    });
     console.log(vm.user);
 
     // function to handle login form
