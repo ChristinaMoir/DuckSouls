@@ -1,0 +1,28 @@
+<div class="jumbotron text-center" ng-show="user.processing">
+  <span class="glyphicon glyphicon-repeat spinner"></span>
+  <p>Loading Scores...</p>
+</div>
+
+<table class="table table-bordered table-striped" ng-show="user.users">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Yellow</th>
+      <th>Green</th>
+      <th>Blue</th>
+      <th>Pink</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="person in user.users">
+      <td>{{ person.username }}</td>
+      <td>{{ person.yellow }}</td>
+      <td>{{ person.green }}</td>
+      <td>{{ person.blue }}</td>
+      <td>{{ person.pink }}</td>
+      <td>{{ person.score }}</td>
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -1,6 +1,6 @@
 angular.module('gameCtrl', ['gameService', 'authService'])
 
-  .controller('gameController', function($scope, Auth, Chat, User, $routeParams) {
+  .controller('gameController', function($scope, Auth, Chat, User, $routeParams, $window, AuthToken) {
     var vm = this;
     vm.username = "";
     vm.userID = "";
@@ -350,7 +350,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
       $.each(data.layers, function(key, val) {
 
-        console.log(val);
+        // console.log(val);
         // draw the map:
         var count = 0;
 
@@ -420,24 +420,31 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     Auth.getUser()
       .then(function(data) {
-        //console.log(data.data.username)
+        // console.log(data.data)
         vm.username = data.data.username;
         vm.userID = data.data.userID;
         socket.on('connect', function(data) {
           socket.emit('join', vm.username);
         });
-        //create player
-        socket.emit('draw_Player', {
-          x: Math.floor(Math.random() * 100),
-          y: 20,
-          name: vm.username,
-          direction: "down",
-          container: "stagingArea",
-          green: data.green,
-          yellow: data.yellow,
-          pink: data.pink,
-          blue: data.blue
-        });
+
+        User.get(vm.userID)
+          .then(function(data) {
+            // console.log(data);
+            //create player
+            socket.emit('draw_Player', {
+              x: Math.floor(Math.random() * 100),
+              y: 20,
+              name: vm.username,
+              direction: "down",
+              container: "stagingArea",
+              green: data.data.green,
+              yellow: data.data.yellow,
+              pink: data.data.pink,
+              blue: data.data.blue,
+              score: data.data.score
+            });
+          });
+
       });
     Chat.all()
       .then(function(data) {
@@ -457,7 +464,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     // stage.update();
 
     vm.focus = function(event) {
-      console.log(event);
+      // console.log(event);
       event.target.focus();
 
     }
@@ -628,18 +635,20 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     socket.on('removeDuck', function(data) {
       var container = $scope[data.container];
       var duck = container.getChildByName(data.id);
-      console.log(duck);
+      //  console.log(duck);
       container.removeChild(duck);
+
+      var score = (data.yellow * 1) + (data.green * 2) + (data.blue * 3) + (data.pink * 4);
 
       // call the userService function to update
       if (data.name == vm.username) {
-
         User.update(vm.userID, {
             user_id: vm.userID,
             yellow: data.yellow,
             green: data.green,
             blue: data.blue,
-            pink: data.pink
+            pink: data.pink,
+            score: score
           })
           .then(function(data) {
             // bind the message from our API to game.message

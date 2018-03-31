@@ -1,6 +1,6 @@
 angular.module('userCtrl', ['userService', 'authService'])
 
-  .controller('userController', function(User) {
+  .controller('userController', function(User, $rootScope) {
 
     var vm = this;
 
@@ -16,7 +16,25 @@ angular.module('userCtrl', ['userService', 'authService'])
 
         // bind the users that come back to vm.users
         vm.users = data.data;
+        vm.users.sort(compareNumbers);
       });
+
+    function compareNumbers(a, b) {
+      return b.score - a.score;
+    }
+
+    $rootScope.$on('$routeChangeStart', function() {
+      User.all()
+        .then(function(data) {
+
+          // when all the users come back, remove the processing variable
+          vm.processing = false;
+
+          // bind the users that come back to vm.users
+          vm.users = data.data;
+          vm.users.sort(compareNumbers);
+        });
+    });
 
     // function to delete a user
     vm.deleteUser = function(id) {

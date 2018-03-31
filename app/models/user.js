@@ -46,6 +46,12 @@ var UserSchema = new Schema({
     required: false,
     select: true,
     default: 0
+  },
+  score: {
+    type: Number,
+    required: false,
+    select: true,
+    default: 0
   }
 
 });

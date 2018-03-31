@@ -49,7 +49,7 @@ module.exports = function(app, express) {
     // find the user
     User.findOne({
       username: req.body.username
-    }).select('name username password _id').exec(function(err, user) {
+    }).select('name username password _id ').exec(function(err, user) {
 
       if (err) throw err;
 
@@ -69,7 +69,7 @@ module.exports = function(app, express) {
             message: 'Authentication failed. Wrong password.'
           });
         } else {
-          console.log(user);
+          //console.log(user);
           // if user is found and password is right
           // create a token
           var token = jwt.sign({
@@ -202,8 +202,8 @@ module.exports = function(app, express) {
     // update the user with this id
     .put(function(req, res) {
       User.findById(req.params.user_id, function(err, user) {
-        console.log(user);
-        console.log(req);
+        // console.log(user);
+
         if (err) res.send(err);
         // set the new user information if it exists in the request
         if (req.body.name) user.name = req.body.name;
@@ -213,6 +213,7 @@ module.exports = function(app, express) {
         if (req.body.pink) user.pink = req.body.pink;
         if (req.body.blue) user.blue = req.body.blue;
         if (req.body.green) user.green = req.body.green;
+        if (req.body.score) user.score = req.body.score;
 
         // save the user
         user.save(function(err) {

@@ -93,16 +93,20 @@ io.on('connection', function(socket) {
   // add handler for message type "draw_line".
   socket.on('draw_Player', function(data) {
     // add received line to history
-    players.set(data.name, {
-      x: data.x,
-      y: data.y,
-      container: data.container,
-      name: data.name,
-      yellow: data.yellow,
-      blue: data.blue,
-      green: data.green,
-      pink: data.pink
-    });
+    console.log(data)
+    if (data.yellow != undefined) {
+      players.set(data.name, {
+        x: data.x,
+        y: data.y,
+        container: data.container,
+        name: data.name,
+        yellow: data.yellow,
+        blue: data.blue,
+        green: data.green,
+        pink: data.pink,
+        score: data.score
+      });
+    }
     console.log(players.get(data.name))
     // send line to all clients
     io.emit('draw_Player', {

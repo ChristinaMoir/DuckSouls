@@ -45,6 +45,13 @@ angular.module('app.routes', ['ngRoute'])
         controllerAs: 'game'
       })
 
+      // show all users
+      .when('/scores', {
+        templateUrl: 'app/views/pages/scoreTable.html',
+        controller: 'userController',
+        controllerAs: 'user'
+      })
+
     $locationProvider.html5Mode(true);
 
   });
