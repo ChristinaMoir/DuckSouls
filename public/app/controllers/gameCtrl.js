@@ -423,8 +423,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         //console.log(data.data.username)
         vm.username = data.data.username;
         vm.userID = data.data.userID;
-        console.log(vm.userID)
-        console.log(data.data)
         socket.on('connect', function(data) {
           socket.emit('join', vm.username);
         });
@@ -434,7 +432,11 @@ angular.module('gameCtrl', ['gameService', 'authService'])
           y: 20,
           name: vm.username,
           direction: "down",
-          container: "stagingArea"
+          container: "stagingArea",
+          green: data.green,
+          yellow: data.yellow,
+          pink: data.pink,
+          blue: data.blue
         });
       });
     Chat.all()

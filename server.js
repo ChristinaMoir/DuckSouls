@@ -98,9 +98,10 @@ io.on('connection', function(socket) {
       y: data.y,
       container: data.container,
       name: data.name,
-      yellow: 0,
-      blue: 0,
-      green: 0
+      yellow: data.yellow,
+      blue: data.blue,
+      green: data.green,
+      pink: data.pink
     });
     console.log(players.get(data.name))
     // send line to all clients
