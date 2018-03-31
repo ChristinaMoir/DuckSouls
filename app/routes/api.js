@@ -49,7 +49,7 @@ module.exports = function(app, express) {
     // find the user
     User.findOne({
       username: req.body.username
-    }).select('name username password').exec(function(err, user) {
+    }).select('name username password _id').exec(function(err, user) {
 
       if (err) throw err;
 
@@ -75,7 +75,8 @@ module.exports = function(app, express) {
           var token = jwt.sign({
             name: user.name,
             username: user.username,
-            admin: user.admin
+            admin: user.admin,
+            userID: user._id
           }, superSecret, {
             expiresIn: '24h' // expires in 24 hours
           });
@@ -201,13 +202,17 @@ module.exports = function(app, express) {
     // update the user with this id
     .put(function(req, res) {
       User.findById(req.params.user_id, function(err, user) {
-
+        console.log(user);
+        console.log(req);
         if (err) res.send(err);
-
         // set the new user information if it exists in the request
         if (req.body.name) user.name = req.body.name;
         if (req.body.username) user.username = req.body.username;
         if (req.body.password) user.password = req.body.password;
+        if (req.body.yellow) user.yellow = req.body.yellow;
+        if (req.body.pink) user.pink = req.body.pink;
+        if (req.body.blue) user.blue = req.body.blue;
+        if (req.body.green) user.green = req.body.green;
 
         // save the user
         user.save(function(err) {

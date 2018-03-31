@@ -22,7 +22,32 @@ var UserSchema = new Schema({
     required: false,
     select: true,
     default: false
+  },
+  yellow: {
+    type: Number,
+    required: false,
+    select: true,
+    default: 0
+  },
+  blue: {
+    type: Number,
+    required: false,
+    select: true,
+    default: 0
+  },
+  green: {
+    type: Number,
+    required: false,
+    select: true,
+    default: 0
+  },
+  pink: {
+    type: Number,
+    required: false,
+    select: true,
+    default: 0
   }
+
 });
 
 // hash the password before the user is saved

@@ -38,9 +38,9 @@ angular.module('app.routes', ['ngRoute'])
         controllerAs: 'user'
       })
 
-      // chat app
+      // game app
       .when('/play', {
-        templateUrl: 'app/views/pages/chat.html',
+        templateUrl: 'app/views/pages/game.html',
         controller: 'gameController',
         controllerAs: 'game'
       })

@@ -1,8 +1,9 @@
 angular.module('gameCtrl', ['gameService', 'authService'])
 
-  .controller('gameController', function($scope, Auth, Chat) {
+  .controller('gameController', function($scope, Auth, Chat, User, $routeParams) {
     var vm = this;
     vm.username = "";
+    vm.userID = "";
     var stage = new createjs.Stage("gameCanvas");
     //Background
     var grass = new createjs.Shape();
@@ -421,7 +422,9 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       .then(function(data) {
         //console.log(data.data.username)
         vm.username = data.data.username;
-
+        vm.userID = data.data.userID;
+        console.log(vm.userID)
+        console.log(data.data)
         socket.on('connect', function(data) {
           socket.emit('join', vm.username);
         });
@@ -625,6 +628,22 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       var duck = container.getChildByName(data.id);
       console.log(duck);
       container.removeChild(duck);
+
+      // call the userService function to update
+      if (data.name == vm.username) {
+
+        User.update(vm.userID, {
+            user_id: vm.userID,
+            yellow: data.yellow,
+            green: data.green,
+            blue: data.blue,
+            pink: data.pink
+          })
+          .then(function(data) {
+            // bind the message from our API to game.message
+            vm.message = data.message;
+          });
+      }
     })
 
     socket.on('player:left', function(data) {
