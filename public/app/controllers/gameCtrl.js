@@ -474,22 +474,29 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       var player = stage.getChildAt(1).getChildByName(vm.username);
       var intersect = false;
       var direction = "down";
+      var x = player.x;
+      var y = player.y;
       if (event.keyCode == 37) {
         direction = "left";
+        x -= 5;
       }
       //up
       if (event.keyCode == 38) {
         direction = "up";
+        y -= 5;
       }
       //right
       if (event.keyCode == 39) {
         direction = "right";
+        x += 5;
       }
       //down
       if (event.keyCode == 40) {
         direction = "down";
+        y += 5;
       }
       stage.update();
+      intersect = nonWalkable(player, stage.getChildAt(1), x, y, direction)
       // socket.emit('move', {
       //   x: player.x,
       //   y: player.y,
@@ -539,10 +546,11 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     })
 
     socket.on('moved', function(data) {
-      console.log(data.direction);
+      //console.log(data.direction);
       var container = $scope[data.container];
       var newPos = container.getChildByName(data.name);
-      container.setChildIndex(newPos, container.children.length - 1)
+
+      container.setChildIndex(newPos, container.children.length - 1);
       createjs.Tween.get(newPos).to({
         x: data.x,
         y: data.y
@@ -560,7 +568,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       onDuck(data);
       if (data.container == "stagingArea") {
         if ((data.x >= 208 && data.x <= 224) && (data.y >= 64 && data.y <= 80)) {
-          console.log(data.yellow)
+          //console.log(data.yellow)
           if (data.yellow >= 5) {
             nextLevel(data, "levelOne", "#d5d5d5");
           } else {
@@ -585,7 +593,30 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         }
       }
 
+
     });
+
+    function nonWalkable(player, container, x, y, direction) {
+
+      if (direction == "left") {
+        var obj = container.getObjectsUnderPoint(x, y + 16);
+      } else if (direction == "right") {
+        var obj = container.getObjectsUnderPoint(x + 8, y + 16);
+      } else if (direction == "up") {
+        var obj = container.getObjectsUnderPoint(x + 4, y);
+      } else if (direction == "down") {
+        var obj = container.getObjectsUnderPoint(x + 4, y + 21);
+      }
+
+      if ((obj[0] && obj[0].name == "Base") || (obj[1] && obj[1].name == "Base") || (obj[2] && obj[2].name == "Base")) {
+        return true;
+      } else {
+        return false;
+      }
+
+
+    }
+
 
     function nextLevel(data, level, colour) {
       console.log(colour);
@@ -620,7 +651,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     function onDuck(data) {
       var container = $scope[data.container];
       var obj = container.getObjectsUnderPoint(data.x + 8, data.y + 16);
-      console.log(obj);
+      //console.log(obj);
       if (obj[1] && obj[1].image) {
         socket.emit('removeDuck', {
           //  x: player.x,

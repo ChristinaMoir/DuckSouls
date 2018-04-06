@@ -127,7 +127,7 @@ io.on('connection', function(socket) {
     // console.log(duckCount.get(data.container).length)
     var id = Math.floor(Math.random() * 2000 + Math.random() * 1000);
     // console.log("id:" + id)
-    if (duckCount.get(data.container).length < 5) {
+    if ((data.container == "stagingArea" && duckCount.get(data.container).length < 5) || (duckCount.get(data.container).length < 10)) {
       io.sockets.emit('addDuck', {
         x: data.x,
         y: data.y,
@@ -176,7 +176,7 @@ io.on('connection', function(socket) {
     var playerMoved = players.get(data.name);
     var nextX = playerMoved.x;
     var nextY = playerMoved.y;
-    var intersect = false;
+    var intersect = data.intersect;
     if (intersect) {
       io.sockets.emit('moved', {
         x: nextX,
