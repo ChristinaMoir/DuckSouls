@@ -117,12 +117,10 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       images: [girl],
       framerate: 4,
       // width, height & registration point of each sprite
-      frames: {
-        width: 16,
-        height: 32,
-        regX: 0,
-        regY: 0
-      },
+      frames: [
+        [0, 0, 16, 32],
+        [128, 0, 32, 32]
+      ],
       animations: {
         down: [0, 3, "down", 1],
         right: [17, 20, "right", 1],
@@ -147,7 +145,11 @@ angular.module('gameCtrl', ['gameService', 'authService'])
           frames: [22, 23, 24, 26, 27, 28, 29],
           next: "idleRight",
           speed: 0.5
-        }
+        },
+        attackDown: [68, 71, "idleDown", 1],
+        attackUp: [77, 80, "idleUp", 1],
+        attackRight: [86, 89, "idleRight", 1],
+        attackLeft: [95, 98, "idleLeft", 1]
       }
 
     });
@@ -515,7 +517,16 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     socket.on('addDuck', function(data) {
       var duck = new Image();
-      duck.src = "assets/img/duckPng.png";
+      if (data.container == "stagingArea") {
+        duck.src = "assets/img/duckPng.png";
+      } else if (data.container == "levelOne") {
+        duck.src = "assets/img/duckGreen.png";
+      } else if (data.container == "levelTwo") {
+        duck.src = "assets/img/duckPink.png";
+      } else if (data.container == "levelThree") {
+        duck.src = "assets/img/duckBlue.png";
+      }
+
       duck.data = {
         x: data.x,
         y: data.y,
@@ -572,29 +583,33 @@ angular.module('gameCtrl', ['gameService', 'authService'])
           if (data.yellow >= 5) {
             nextLevel(data, "levelOne", "#d5d5d5");
           } else {
-            moreDucks(data.yellow, "yellow");
+            moreDucks(data.yellow, 5 - data.yellow, "yellow");
           }
         }
 
-        if ((data.x >= 304 && data.x <= 320) && (data.y >= 320 && data.y <= 336)) {
+        if ((data.x >= 304 && data.x <= 320) && (data.y >= 310 && data.y <= 325)) {
           if (data.green >= 15) {
             nextLevel(data, "levelTwo", "black");
           } else {
-            moreDucks(data.green, "green");
+            moreDucks(data.green, 15 - data.green, "green");
           }
         }
 
-        if ((data.x >= 400 && data.x <= 416) && (data.y >= 96 && data.y <= 112)) {
-          if (data.blue >= 30) {
+        if ((data.x >= 400 && data.x <= 416) && (data.y >= 80 && data.y <= 100)) {
+          if (data.pink >= 30) {
             nextLevel(data, "levelThree", "green");
           } else {
-            moreDucks(data.yellow, "blue");
+            moreDucks(data.pink, 30 - data.pink, "pink");
           }
         }
       }
 
 
     });
+
+    function moreDucks(numDucks, missingDucks, colour) {
+      alert("You have " + numDucks + " " + colour + " ducks. You need " + missingDucks + " more to access this level.");
+    }
 
     function nonWalkable(player, container, x, y, direction) {
 
@@ -669,7 +684,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       //  console.log(duck);
       container.removeChild(duck);
 
-      var score = (data.yellow * 1) + (data.green * 2) + (data.blue * 3) + (data.pink * 4);
+      var score = (data.yellow * 1) + (data.green * 2) + (data.pink * 3) + (data.blue * 4);
 
       // call the userService function to update
       if (data.name == vm.username) {

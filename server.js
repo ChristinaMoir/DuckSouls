@@ -149,7 +149,16 @@ io.on('connection', function(socket) {
   socket.on('removeDuck', function(data) {
     //var type = data.duckType;
     var player = players.get(data.name)
-    player.yellow += 1;
+    if (data.container == "stagingArea") {
+      player.yellow += 1;
+    } else if (data.container == "levelOne") {
+      player.green += 1;
+    } else if (data.container == "levelTwo") {
+      player.pink += 1;
+    } else if (data.container == "levelThree") {
+      player.blue += 1;
+    }
+
     // console.log(players.get(data.name))
     for (var i = 0; i < duckCount.get(data.container).length; i++) {
       // console.log(duckCount.get(data.container)[i][2])
@@ -266,7 +275,8 @@ io.on('connection', function(socket) {
       container: data.container,
       yellow: playerMoved.yellow,
       green: playerMoved.green,
-      blue: playerMoved.blue
+      blue: playerMoved.blue,
+      pink: playerMoved.pink
     });
   });
 
