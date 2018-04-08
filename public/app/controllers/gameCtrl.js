@@ -119,7 +119,89 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       // width, height & registration point of each sprite
       frames: [
         [0, 0, 16, 32],
-        [128, 0, 32, 32]
+        [16, 0, 16, 32],
+        [(16 * 2), 0, 16, 32],
+        [(16 * 3), 0, 16, 32],
+        [(16 * 4), 0, 16, 32],
+        [(16 * 5), 0, 16, 32],
+        [(16 * 6), 0, 16, 32],
+        [(16 * 7), 0, 16, 32],
+        [(16 * 8), 0, 16, 32],
+        [(16 * 9), 0, 16, 32],
+        [(16 * 10), 0, 16, 32],
+        [(16 * 11), 0, 16, 32],
+        [(16 * 12), 0, 16, 32],
+        [(16 * 13), 0, 16, 32],
+        [(16 * 14), 0, 16, 32],
+        [(16 * 15), 0, 16, 32],
+        [(16 * 16), 0, 16, 32],
+        [0, 32, 16, 32],
+        [16, 32, 16, 32],
+        [(16 * 2), 32, 16, 32],
+        [(16 * 3), 32, 16, 32],
+        [(16 * 4), 32, 16, 32],
+        [(16 * 5), 32, 16, 32],
+        [(16 * 6), 32, 16, 32],
+        [(16 * 7), 32, 16, 32],
+        [(16 * 8), 32, 16, 32],
+        [(16 * 9), 32, 16, 32],
+        [(16 * 10), 32, 16, 32],
+        [(16 * 11), 32, 16, 32],
+        [(16 * 12), 32, 16, 32],
+        [(16 * 13), 32, 16, 32],
+        [(16 * 14), 32, 16, 32],
+        [(16 * 15), 32, 16, 32],
+        [(16 * 16), 32, 16, 32],
+        [0, 64, 16, 32],
+        [16, 64, 16, 32],
+        [(16 * 2), 64, 16, 32],
+        [(16 * 3), 64, 16, 32],
+        [(16 * 4), 64, 16, 32],
+        [(16 * 5), 64, 16, 32],
+        [(16 * 6), 64, 16, 32],
+        [(16 * 7), 64, 16, 32],
+        [(16 * 8), 64, 16, 32],
+        [(16 * 9), 64, 16, 32],
+        [(16 * 10), 64, 16, 32],
+        [(16 * 11), 64, 16, 32],
+        [(16 * 12), 64, 16, 32],
+        [(16 * 13), 64, 16, 32],
+        [(16 * 14), 64, 16, 32],
+        [(16 * 15), 64, 16, 32],
+        [(16 * 16), 64, 16, 32],
+        [0, 96, 16, 32],
+        [16, 96, 16, 32],
+        [(16 * 2), 96, 16, 32],
+        [(16 * 3), 96, 16, 32],
+        [(16 * 4), 96, 16, 32],
+        [(16 * 5), 96, 16, 32],
+        [(16 * 6), 96, 16, 32],
+        [(16 * 7), 96, 16, 32],
+        [(16 * 8), 96, 16, 32],
+        [(16 * 9), 96, 16, 32],
+        [(16 * 10), 96, 16, 32],
+        [(16 * 11), 96, 16, 32],
+        [(16 * 12), 96, 16, 32],
+        [(16 * 13), 96, 16, 32],
+        [(16 * 14), 96, 16, 32],
+        [(16 * 15), 96, 16, 32],
+        [(16 * 16), 96, 16, 32],
+        [0, 128, 32, 32, 0, 8, 0],
+        [32, 128, 32, 32, 0, 8, 0],
+        [64, 128, 32, 32, 0, 8, 0],
+        [96, 128, 32, 32, 0, 8, 0],
+        [0, 160, 32, 32, 0, 8, 0],
+        [32, 160, 32, 32, 0, 8, 0],
+        [64, 160, 32, 32, 0, 8, 0],
+        [96, 160, 32, 32, 0, 8, 0],
+        [0, 192, 32, 32, 0, 8, 0],
+        [32, 192, 32, 32, 0, 8, 0],
+        [64, 192, 32, 32, 0, 8, 0],
+        [96, 192, 32, 32, 0, 8, 0],
+        [0, 224, 32, 32, 0, 8, 0],
+        [32, 224, 32, 32, 0, 8, 0],
+        [64, 224, 32, 32, 0, 8, 0],
+        [96, 224, 32, 32, 0, 8, 0],
       ],
       animations: {
         down: [0, 3, "down", 1],
@@ -146,10 +228,10 @@ angular.module('gameCtrl', ['gameService', 'authService'])
           next: "idleRight",
           speed: 0.5
         },
-        attackDown: [68, 71, "idleDown", 1],
-        attackUp: [77, 80, "idleUp", 1],
-        attackRight: [86, 89, "idleRight", 1],
-        attackLeft: [95, 98, "idleLeft", 1]
+        attackdown: [68, 71, "down", 1],
+        attackup: [72, 75, "up", 1],
+        attackright: [76, 79, "right", 1],
+        attackleft: [80, 83, "left", 1]
       }
 
     });
@@ -178,20 +260,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       }
       stage.update(event);
     }
-
-    // define a tile map:
-    // var map = [
-    //   [1, 1, 1, 1, 1, 1, 1, 2, 2, 3],
-    //   [9, 10, 10, 10, 10, 10, 10, 10, 10, 11],
-    //   [9, 10, 10, 10, 20, 21, 10, 10, 10, 11],
-    //   [17, 18, 18, 18, 19, 17, 18, 18, 18, 19],
-    //   [30, 30, 31, 30, 6, 8, 46, 30, 40, 30],
-    //   [30, 30, 40, 32, 14, 16, 30, 30, 30, 30],
-    //   [30, 30, 30, 30, 14, 16, 48, 30, 31, 30],
-    //   [40, 30, 48, 31, 14, 16, 30, 40, 30, 30],
-    //   [30, 30, 30, 30, 14, 16, 30, 48, 32, 30],
-    //   [30, 30, 40, 30, 14, 16, 30, 30, 30, 30]
-    // ]
 
 
 
@@ -373,42 +441,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         }
       });
     });
-    // var sea = new createjs.Shape();
-    // sea.graphics.beginFill('#1e7cb8');
-    // sea.graphics.drawRect(0, (stage.canvas.height / 2) + 15, stage.canvas.width, stage.canvas.height / 2);
-    // sea.graphics.endFill();
-    //
-    // stage.addChild(sea);
-
-    // // draw the map:
-    // for (var row = 0; row < (stage.canvas.height / 2); row += 15) {
-    //   for (var col = 0; col < stage.canvas.width; col += 15) {
-    //     //var idx = map[row][col] - 1;
-    //     var rand = Math.random() * 4;
-    //     if (rand > 3) {
-    //       var tile = new createjs.Sprite(ss);
-    //       tile.gotoAndStop(0);
-    //       tile.x = col;
-    //       tile.y = row;
-    //       stage.addChild(tile);
-    //     }
-    //
-    //   }
-    // }
-    // // draw the map:
-    // for (var row = (stage.canvas.height / 2) + 15; row < stage.canvas.height; row += 15) {
-    //   for (var col = 0; col < stage.canvas.width; col += 15) {
-    //     //var idx = map[row][col] - 1;
-    //     var rand = Math.random() * 4;
-    //     if (rand > 3) {
-    //       var tile = new createjs.Sprite(ss);
-    //       tile.gotoAndStop(40);
-    //       tile.x = col;
-    //       tile.y = row;
-    //       stage.addChild(tile);
-    //     }
-    //   }
-    // }
 
     // update the stage to draw to screen:
     stage.update();
@@ -478,39 +510,36 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       var direction = "down";
       var x = player.x;
       var y = player.y;
-      if (event.keyCode == 37) {
+      var type = "move";
+      if (event.keyCode == 37 || event.keyCode == 65) {
         direction = "left";
         x -= 5;
-      }
-      //up
-      if (event.keyCode == 38) {
+      } else if (event.keyCode == 38 || event.keyCode == 87) {
         direction = "up";
         y -= 5;
-      }
-      //right
-      if (event.keyCode == 39) {
+      } else if (event.keyCode == 39 || event.keyCode == 68) {
         direction = "right";
         x += 5;
-      }
-      //down
-      if (event.keyCode == 40) {
+      } else if (event.keyCode == 40 || event.keyCode == 83) {
         direction = "down";
         y += 5;
+      } else if (event.keyCode == 32) {
+        direction = player.currentAnimation;
+        type = "attack";
+      } else {
+        return;
       }
-      stage.update();
-      intersect = nonWalkable(player, stage.getChildAt(1), x, y, direction)
-      // socket.emit('move', {
-      //   x: player.x,
-      //   y: player.y,
-      //   name: player.name
-      // });
+      if (type != "attack") {
+        intersect = nonWalkable(player, stage.getChildAt(1), x, y, direction)
+      }
       socket.emit('move', {
         //  x: player.x,
         //  y: player.y,
         name: player.name,
         direction: direction,
         intersect: intersect,
-        container: currStage
+        container: currStage,
+        type: type
       });
 
     }
@@ -561,49 +590,70 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       var container = $scope[data.container];
       var newPos = container.getChildByName(data.name);
 
+
       container.setChildIndex(newPos, container.children.length - 1);
-      createjs.Tween.get(newPos).to({
-        x: data.x,
-        y: data.y
-      });
-      if (data.direction != newPos.currentAnimation) {
-        newPos.gotoAndPlay(data.direction);
-        console.log(data.direction);
-      }
-      stage.update();
-      if (vm.username == data.name && stage.getChildAt(1).name != "stagingArea") {
-        container.regX = data.x;
-        container.regY = data.y;
+      if (data.type == "move") {
+        createjs.Tween.get(newPos).to({
+          x: data.x,
+          y: data.y
+        });
+        if (data.direction != newPos.currentAnimation) {
+          newPos.gotoAndPlay(data.direction);
+          // console.log(data.direction);
+        }
+        stage.update();
+        if (vm.username == data.name && stage.getChildAt(1).name != "stagingArea") {
+          container.regX = data.x;
+          container.regY = data.y;
 
-      }
-      onDuck(data);
-      if (data.container == "stagingArea") {
-        if ((data.x >= 208 && data.x <= 224) && (data.y >= 64 && data.y <= 80)) {
-          //console.log(data.yellow)
-          if (data.yellow >= 5) {
-            nextLevel(data, "levelOne", "#d5d5d5");
-          } else {
-            moreDucks(data.yellow, 5 - data.yellow, "yellow");
+        }
+        onDuck(data);
+        if (data.container == "stagingArea") {
+          if ((data.x >= 208 && data.x <= 224) && (data.y >= 64 && data.y <= 80)) {
+            //console.log(data.yellow)
+            if (data.yellow >= 5) {
+              nextLevel(data, "levelOne", "#d5d5d5");
+            } else {
+              moreDucks(data.yellow, 5 - data.yellow, "yellow");
+            }
+          }
+
+          if ((data.x >= 304 && data.x <= 320) && (data.y >= 310 && data.y <= 325)) {
+            if (data.green >= 15) {
+              nextLevel(data, "levelTwo", "black");
+            } else {
+              moreDucks(data.green, 15 - data.green, "green");
+            }
+          }
+
+          if ((data.x >= 400 && data.x <= 416) && (data.y >= 80 && data.y <= 100)) {
+            if (data.pink >= 30) {
+              nextLevel(data, "levelThree", "green");
+            } else {
+              moreDucks(data.pink, 30 - data.pink, "pink");
+            }
           }
         }
-
-        if ((data.x >= 304 && data.x <= 320) && (data.y >= 310 && data.y <= 325)) {
-          if (data.green >= 15) {
-            nextLevel(data, "levelTwo", "black");
-          } else {
-            moreDucks(data.green, 15 - data.green, "green");
-          }
-        }
-
-        if ((data.x >= 400 && data.x <= 416) && (data.y >= 80 && data.y <= 100)) {
-          if (data.pink >= 30) {
-            nextLevel(data, "levelThree", "green");
-          } else {
-            moreDucks(data.pink, 30 - data.pink, "pink");
-          }
+      } else if (data.type == "attack") {
+        var animation = "attack" + data.direction;
+        newPos.gotoAndPlay(animation);
+        console.log(data.hitPlayer);
+        var score = (data.hitPlayer.yellow * 1) + (data.hitPlayer.green * 2) + (data.hitPlayer.pink * 3) + (data.hitPlayer.blue * 4);
+        if (data.hitPlayer.name == vm.username) {
+          User.update(vm.userID, {
+              user_id: vm.userID,
+              yellow: data.hitPlayer.yellow,
+              green: data.hitPlayer.green,
+              blue: data.hitPlayer.blue,
+              pink: data.hitPlayer.pink,
+              score: score
+            })
+            .then(function(data) {
+              // bind the message from our API to game.message
+              vm.message = data.message;
+            });
         }
       }
-
 
     });
 

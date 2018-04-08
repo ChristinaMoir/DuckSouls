@@ -186,6 +186,7 @@ io.on('connection', function(socket) {
     var nextX = playerMoved.x;
     var nextY = playerMoved.y;
     var intersect = data.intersect;
+    var hitPlayer = "";
     if (intersect) {
       io.sockets.emit('moved', {
         x: nextX,
@@ -195,7 +196,8 @@ io.on('connection', function(socket) {
         container: data.container,
         yellow: playerMoved.yellow,
         green: playerMoved.green,
-        blue: playerMoved.blue
+        blue: playerMoved.blue,
+        type: data.type
       });
       return;
     }
@@ -233,6 +235,7 @@ io.on('connection', function(socket) {
             {
               if ((nextX <= item.x + 8 && playerMoved.x > item.x - 8) && (nextY >= item.y - 16 && nextY <= item.y + 16)) {
                 intersect = true;
+                hitPlayer = item;
               }
               break;
             }
@@ -240,6 +243,7 @@ io.on('connection', function(socket) {
             {
               if ((nextY <= item.y + 16 && playerMoved.y > item.y - 16) && (nextX >= item.x - 8 && nextX <= item.x + 8)) {
                 intersect = true;
+                hitPlayer = item;
               }
               break;
             }
@@ -247,6 +251,7 @@ io.on('connection', function(socket) {
             {
               if ((nextX >= item.x - 8 && playerMoved.x < item.x + 8) && (nextY >= item.y - 16 && nextY <= item.y + 16)) {
                 intersect = true;
+                hitPlayer = item;
               }
               break;
             }
@@ -254,6 +259,7 @@ io.on('connection', function(socket) {
             {
               if ((nextY >= item.y - 16 && playerMoved.y < item.y + 16) && (nextX >= item.x - 8 && nextX <= item.x + 8)) {
                 intersect = true;
+                hitPlayer = item;
               }
               break;
             }
@@ -267,6 +273,23 @@ io.on('connection', function(socket) {
       playerMoved.direction = data.direction;
 
     }
+    if (intersect && data.type == "attack") {
+
+      if (data.container == "stagingArea") {
+        var num = (hitPlayer.yellow >= 2) ? 2 : 0;
+        //console.log(num + "," + hitPlayer.yellow)
+        hitPlayer.yellow -= num;
+      } else if (data.container == "levelOne") {
+        var num = (hitPlayer.green >= 4) ? 4 : 0;
+        hitPlayer.green -= num;
+      } else if (data.container == "levelTwo") {
+        var num = (hitPlayer.pink >= 6) ? 6 : 0;
+        hitPlayer.pink -= num;
+      } else if (data.container == "levelThree") {
+        var num = (hitPlayer.blue >= 8) ? 8 : 0;
+        hitPlayer.blue -= num;
+      }
+    }
     io.sockets.emit('moved', {
       x: playerMoved.x,
       y: playerMoved.y,
@@ -276,7 +299,10 @@ io.on('connection', function(socket) {
       yellow: playerMoved.yellow,
       green: playerMoved.green,
       blue: playerMoved.blue,
-      pink: playerMoved.pink
+      pink: playerMoved.pink,
+      type: data.type,
+      intersect: intersect,
+      hitPlayer: hitPlayer
     });
   });
 
