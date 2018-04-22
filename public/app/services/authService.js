@@ -53,10 +53,6 @@ angular.module('authService', [])
         });
     };
 
-    authFactory.createSampleUser = function() {
-      $http.post('/api/sample');
-    };
-
     // return auth factory object
     return authFactory;
 

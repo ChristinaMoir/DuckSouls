@@ -273,20 +273,26 @@ io.on('connection', function(socket) {
       playerMoved.direction = data.direction;
 
     }
+    var colour = "";
+    var num = 0;
     if (intersect && data.type == "attack") {
 
       if (data.container == "stagingArea") {
-        var num = (hitPlayer.yellow >= 2) ? 2 : 0;
+        colour = "yellow";
+        num = (hitPlayer.yellow >= 2) ? 2 : 0;
         //console.log(num + "," + hitPlayer.yellow)
         hitPlayer.yellow -= num;
       } else if (data.container == "levelOne") {
-        var num = (hitPlayer.green >= 4) ? 4 : 0;
+        colour = "green";
+        num = (hitPlayer.green >= 4) ? 4 : 0;
         hitPlayer.green -= num;
       } else if (data.container == "levelTwo") {
-        var num = (hitPlayer.pink >= 6) ? 6 : 0;
+        colour = "pink";
+        num = (hitPlayer.pink >= 6) ? 6 : 0;
         hitPlayer.pink -= num;
       } else if (data.container == "levelThree") {
-        var num = (hitPlayer.blue >= 8) ? 8 : 0;
+        colour = "blue";
+        num = (hitPlayer.blue >= 8) ? 8 : 0;
         hitPlayer.blue -= num;
       }
     }
@@ -301,12 +307,15 @@ io.on('connection', function(socket) {
       blue: playerMoved.blue,
       pink: playerMoved.pink,
       type: data.type,
+      colour: colour,
+      num: num,
       intersect: intersect,
       hitPlayer: hitPlayer
     });
   });
 
   socket.on('disconnect', function() {
+    console.log("Disconnect called")
     players.delete(socket.name);
     socket.broadcast.emit('player:left', {
       name: socket.name
@@ -323,22 +332,3 @@ io.on('connection', function(socket) {
 // ====================================
 server.listen(config.port);
 console.log('Magic happens on port ' + config.port);
-
-// io.sockets.on('connection', function(socket) {
-//   socket.on('new user', function(data, callback) {
-//     if (nicknames.indexOf(data) != -1) {
-//       callback(false);
-//     } else {
-//       callback(true)
-//       socket.nickname = data;
-//       nicknames.push(socket.nickname);
-//       io.sockets.emit('usernames', nicknames);
-//     }
-//   });
-//   socket.on('send message', function(data) {
-//     io.sockets.emit('new message', {
-//       msg: data,
-//       nick: socket.nickname
-//     });
-//   });
-// });

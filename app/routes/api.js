@@ -291,7 +291,6 @@ module.exports = function(app, express) {
 
     // create a user (accessed at POST http://localhost:8080/users)
     .post(function(req, res) {
-
       var chat = new Chat(); // create a new instance of the User model
       chat.username = req.body.username; // set the users name (comes from the request)
       chat.message = req.body.message; // set the users username (comes from the request)

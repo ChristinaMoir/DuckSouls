@@ -52,8 +52,6 @@ angular.module('mainCtrl', [])
       $location.path('/login');
     };
 
-    vm.createSample = function() {
-      Auth.createSampleUser();
-    };
+
 
   });

@@ -1,9 +1,11 @@
 angular.module('gameCtrl', ['gameService', 'authService'])
 
-  .controller('gameController', function($scope, Auth, Chat, User, $routeParams, $window, AuthToken) {
+  .controller('gameController', function($scope, Auth, Chat, User, $rootScope, $window, AuthToken) {
     var vm = this;
     vm.username = "";
     vm.userID = "";
+    vm.gameData = {};
+    vm.gameData.message = "";
     var stage = new createjs.Stage("gameCanvas");
     //Background
     var grass = new createjs.Shape();
@@ -17,9 +19,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     //container for world
     var stagingArea = $scope.stagingArea = new createjs.Container();
     stagingArea.name = "stagingArea";
-    //console.log(stagingArea);
-    // stagingArea.x = 0;
-    // stagingArea.y = 0;
 
     var levelOne = $scope.levelOne = new createjs.Container();
     levelOne.name = "levelOne";
@@ -568,21 +567,15 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     socket.on('draw_Player', function(data) {
 
-      var animation = new createjs.Sprite(spriteSheet, "down");
+      var character = new createjs.Sprite(spriteSheet, "down");
       //console.log($scope[data.stage]);
       var container = $scope[data.container];
-      animation.x = data.x;
-      animation.y = data.y;
-      animation.name = data.name;
-      container.addChild(animation);
+      character.x = data.x;
+      character.y = data.y;
+      character.name = data.name;
+      container.addChild(character);
       stage.update();
-      // var circle = new createjs.Shape();
-      // circle.graphics.beginFill("gold").drawCircle(0, 0, data.radius);
-      // circle.x = data.x;
-      // circle.y = data.y;
-      // circle.name = data.name;
-      // stage.addChild(circle);
-      // stage.update();
+
     })
 
     socket.on('moved', function(data) {
@@ -637,21 +630,34 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       } else if (data.type == "attack") {
         var animation = "attack" + data.direction;
         newPos.gotoAndPlay(animation);
-        console.log(data.hitPlayer);
-        var score = (data.hitPlayer.yellow * 1) + (data.hitPlayer.green * 2) + (data.hitPlayer.pink * 3) + (data.hitPlayer.blue * 4);
-        if (data.hitPlayer.name == vm.username) {
-          User.update(vm.userID, {
-              user_id: vm.userID,
-              yellow: data.hitPlayer.yellow,
-              green: data.hitPlayer.green,
-              blue: data.hitPlayer.blue,
-              pink: data.hitPlayer.pink,
-              score: score
+        if (data.intersect) {
+          console.log(data.hitPlayer);
+          var score = (data.hitPlayer.yellow * 1) + (data.hitPlayer.green * 2) + (data.hitPlayer.pink * 3) + (data.hitPlayer.blue * 4);
+
+
+          if (data.hitPlayer.name == vm.username) {
+            systemMessage({
+              username: 'System',
+              message: data.name + " attacked " + data.hitPlayer.name
             })
-            .then(function(data) {
-              // bind the message from our API to game.message
-              vm.message = data.message;
-            });
+
+            systemMessage({
+              username: 'System',
+              message: data.hitPlayer.name + " loses " + data.num + " " + data.colour + " ducks"
+            })
+            User.update(vm.userID, {
+                user_id: vm.userID,
+                yellow: data.hitPlayer.yellow,
+                green: data.hitPlayer.green,
+                blue: data.hitPlayer.blue,
+                pink: data.hitPlayer.pink,
+                score: score
+              })
+              .then(function(data) {
+                // bind the message from our API to game.message
+                vm.message = data.message;
+              });
+          }
         }
       }
 
@@ -761,29 +767,41 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     })
 
 
+    function systemMessage(data) {
+      Chat.create(data)
+        .then(function(data) {
+          socket.emit('send message', data);
+        });
+    }
 
     vm.newMessage = function() {
-      //console.log(vm.gameData)
       vm.gameData.username = vm.username;
       Chat.create(vm.gameData)
         .then(function(data) {
-          //  console.log(data);
           vm.gameData = {}
+          console.log(data);
           socket.emit('send message', data);
         });
+
     }
 
 
 
     socket.on('new message', function(data) {
+
       Chat.all()
         .then(function(data) {
-          // bind the users that come back to vm.users
-          //  console.log(data);
+          // bind the messages that come back to vm.users
           vm.messages = data.data;
         });
-      // console.log(data);
 
-      // $chat.append('<strong>' + data.nick + '</strong>: ' + data.msg + "<br/>");
+
+
+    });
+
+    // check to see if a user is logged in on every request
+    $rootScope.$on('$routeChangeStart', function() {
+      console.log("test");
+      socket.disconnect()
     });
   });

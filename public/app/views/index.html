@@ -67,6 +67,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li ng-if="!main.loggedIn"><a href="/login">Login</a></li>
           <li ng-if="main.loggedIn" class="navbar-text">Hello {{ main.user.username }}!</li>
+          <li ng-if="main.loggedIn"><a ng-href="/users/{{ main.user.userID }}">Edit Details</a></li>
           <li ng-if="main.loggedIn"><a href="#" ng-click="main.doLogout()">Logout</a></li>
         </ul>
       </div>

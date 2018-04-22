@@ -86,7 +86,7 @@ angular.module('userCtrl', ['userService', 'authService'])
                   vm.userData = {};
                   vm.message = data.message;
                   console.log('success');
-                  $location.path('/users');
+                  $location.path('/');
                 } else {
                   vm.error = data.message;
                   console.log('fail');
@@ -104,7 +104,7 @@ angular.module('userCtrl', ['userService', 'authService'])
   })
 
   // controller applied to user edit page
-  .controller('userEditController', function($routeParams, User) {
+  .controller('userEditController', function($routeParams, User, $location, Auth) {
 
     var vm = this;
 
@@ -129,11 +129,24 @@ angular.module('userCtrl', ['userService', 'authService'])
         .then(function(data) {
           vm.processing = false;
 
-          // clear the form
-          vm.userData = {};
-
           // bind the message from our API to vm.message
           vm.message = data.message;
+
+          Auth.login(vm.userData.username, vm.userData.password)
+            .then(function(data) {
+              console.log(data);
+              vm.processing = false;
+              // if a user successfully logs in, redirect to users page
+              if (data.success) {
+                console.log('success');
+                $location.path('/');
+              } else {
+                vm.error = data.message;
+                console.log('fail');
+              }
+              vm.userData = {};
+
+            });
         });
     };
 
