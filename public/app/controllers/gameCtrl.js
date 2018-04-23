@@ -531,6 +531,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       if (type != "attack") {
         intersect = nonWalkable(player, stage.getChildAt(1), x, y, direction)
       }
+      console.log(player);
       socket.emit('move', {
         //  x: player.x,
         //  y: player.y,
@@ -595,11 +596,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
           // console.log(data.direction);
         }
         stage.update();
-        if (vm.username == data.name && stage.getChildAt(1).name != "stagingArea") {
-          container.regX = data.x;
-          container.regY = data.y;
 
-        }
         onDuck(data);
         if (data.container == "stagingArea") {
           if ((data.x >= 208 && data.x <= 224) && (data.y >= 64 && data.y <= 80)) {
@@ -626,6 +623,12 @@ angular.module('gameCtrl', ['gameService', 'authService'])
               moreDucks(data.pink, 30 - data.pink, "pink");
             }
           }
+        }
+        if (vm.username == data.name && stage.getChildAt(1).name != "stagingArea") {
+          console.log(data);
+          container.regX = data.x;
+          container.regY = data.y;
+
         }
       } else if (data.type == "attack") {
         var animation = "attack" + data.direction;
@@ -695,8 +698,8 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         //  x: player.x,
         //  y: player.y,
         name: data.name,
-        x: Math.floor(Math.random() * 100),
-        y: 20,
+        x: Math.floor(Math.random() * 100) + 20,
+        y: 40,
         newLevel: level,
         oldLevel: "stagingArea",
         col: colour
@@ -705,13 +708,19 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     socket.on('movedLevel', function(data) {
       backFill.style = data.col;
-      console.log(data.col);
       var newLevel = $scope[data.newLevel];
       var oldLevel = $scope[data.oldLevel];
-      var playerToMove = oldLevel.getChildByName(data.name);
+      var playerToMove = oldLevel.getChildByName(data.name) || newLevel.getChildByName(data.name);
+      //console.log(oldLevel);
+      //console.log(playerToMove)
+      //console.log(data);
+      playerToMove.x = data.x;
+      playerToMove.y = data.y;
       oldLevel.removeChild(playerToMove);
       newLevel.addChild(playerToMove);
-
+      playerToMove.x = data.x;
+      playerToMove.y = data.y;
+      //  console.log(playerToMove);
       newLevel.regX = playerToMove.x;
       newLevel.regY = playerToMove.y;
       stage.removeChildAt(1);
@@ -794,14 +803,13 @@ angular.module('gameCtrl', ['gameService', 'authService'])
           // bind the messages that come back to vm.users
           vm.messages = data.data;
         });
-
-
-
     });
 
     // check to see if a user is logged in on every request
-    $rootScope.$on('$routeChangeStart', function() {
-      console.log("test");
-      socket.disconnect()
+    $scope.$on('$locationChangeStart', function() {
+      socket.emit('deletePlayer', {
+        name: vm.username,
+        container: stage.getChildAt(1).name
+      })
     });
   });

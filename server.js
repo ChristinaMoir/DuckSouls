@@ -146,6 +146,12 @@ io.on('connection', function(socket) {
 
   });
 
+  socket.on('deletePlayer', function(data) {
+    players.delete(data.name);
+    io.sockets.emit('player:left', data);
+
+  });
+
   socket.on('removeDuck', function(data) {
     //var type = data.duckType;
     var player = players.get(data.name)
@@ -296,6 +302,8 @@ io.on('connection', function(socket) {
         hitPlayer.blue -= num;
       }
     }
+
+    console.log(playerMoved);
     io.sockets.emit('moved', {
       x: playerMoved.x,
       y: playerMoved.y,
@@ -316,10 +324,15 @@ io.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     console.log("Disconnect called")
+    var player = players.get(socket.name);
+
+    if (player) {
+      socket.broadcast.emit('player:left', {
+        name: socket.name,
+        container: player.container
+      });
+    }
     players.delete(socket.name);
-    socket.broadcast.emit('player:left', {
-      name: socket.name
-    });
     console.log(socket.name + ' has disconnected from the chat.' + socket.id);
   });
   socket.on('join', function(name) {
