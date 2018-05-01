@@ -36,14 +36,11 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     levelThree.y = 0;
 
     stage.addChild(stagingArea)
-    console.log(stage)
 
     function handleImageLoad() {
       var data = event.path[0].data;
       var image = event.target;
       var bitmap = new createjs.Bitmap(image);
-      console.log(data.id)
-      console.log(event);
       // bitmap.scaleX = 0.1;
       // bitmap.scaleY = 0.1;
       bitmap.x = data.x;
@@ -51,13 +48,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       bitmap.name = data.id;
       var container = $scope[data.container];
       container.addChild(bitmap);
-      // socket.emit('updateDuck', {
-      //   x: data.x,
-      //   y: data.y,
-      //   id: bitmap.id,
-      //   container: data.container
-      // });
-      //console.log(container);
     }
 
     var fontImg = new Image();
@@ -67,6 +57,20 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       frames: {
         width: 8,
         height: 8,
+        regX: 0,
+        regY: 0,
+        spacing: 0,
+        margin: 0
+      }
+    });
+
+    var caveImg = new Image();
+    caveImg.src = "assets/img/cave.png";
+    var cave = new createjs.SpriteSheet({
+      images: [caveImg],
+      frames: {
+        width: 16,
+        height: 16,
         regX: 0,
         regY: 0,
         spacing: 0,
@@ -200,7 +204,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         [0, 224, 32, 32, 0, 8, 0],
         [32, 224, 32, 32, 0, 8, 0],
         [64, 224, 32, 32, 0, 8, 0],
-        [96, 224, 32, 32, 0, 8, 0],
+        [96, 224, 32, 32, 0, 8, 0]
       ],
       animations: {
         down: [0, 3, "down", 1],
@@ -266,7 +270,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
       $.each(data.layers, function(key, val) {
 
-        console.log(val);
         // draw the map:
         var count = 0;
 
@@ -419,7 +422,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
       $.each(data.layers, function(key, val) {
 
-        // console.log(val);
         // draw the map:
         var count = 0;
 
@@ -441,6 +443,56 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       });
     });
 
+    $.getJSON("assets/maps/levelTwo.json", function(data) {
+
+      $.each(data.layers, function(key, val) {
+
+        // draw the map:
+        var count = 0;
+
+        for (var row = 0; row < 720; row += 16) {
+          for (var col = 0; col < 1120; col += 16) {
+
+            var num = val.data[count] - 1;
+            if (num >= 0) {
+              var tile = new createjs.Sprite(cave);
+              tile.gotoAndStop(num);
+              tile.x = col;
+              tile.y = row;
+              tile.name = val.name;
+              levelTwo.addChild(tile);
+            }
+            count++;
+          }
+        }
+      });
+    });
+
+    $.getJSON("assets/maps/levelThree.json", function(data) {
+
+      $.each(data.layers, function(key, val) {
+
+        // draw the map:
+        var count = 0;
+
+        for (var row = 0; row < 720; row += 16) {
+          for (var col = 0; col < 1120; col += 16) {
+
+            var num = val.data[count] - 1;
+            if (num >= 0) {
+              var tile = new createjs.Sprite(ss);
+              tile.gotoAndStop(num);
+              tile.x = col;
+              tile.y = row;
+              tile.name = val.name;
+              levelThree.addChild(tile);
+            }
+            count++;
+          }
+        }
+      });
+    });
+
     // update the stage to draw to screen:
     stage.update();
 
@@ -453,7 +505,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     Auth.getUser()
       .then(function(data) {
-        // console.log(data.data)
         vm.username = data.data.username;
         vm.userID = data.data.userID;
         socket.on('connect', function(data) {
@@ -462,7 +513,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
         User.get(vm.userID)
           .then(function(data) {
-            // console.log(data);
             //create player
             socket.emit('draw_Player', {
               x: Math.floor(Math.random() * 100),
@@ -482,25 +532,13 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     Chat.all()
       .then(function(data) {
         // bind the users that come back to vm.users
-        //console.log(data.data);
         vm.messages = data.data;
       });
 
-
-
-    // var circle = new createjs.Shape();
-    // circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 10);
-    // circle.x = 20;
-    // circle.y = 20;
-    // circle.name = vm.username;
-    // stage.addChild(circle);
-    // stage.update();
-
     vm.focus = function(event) {
-      // console.log(event);
       event.target.focus();
-
     }
+
     vm.move = function(event) {
       event.preventDefault();
       var currStage = stage.getChildAt(1).name;
@@ -531,7 +569,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       if (type != "attack") {
         intersect = nonWalkable(player, stage.getChildAt(1), x, y, direction)
       }
-      console.log(player);
       socket.emit('move', {
         //  x: player.x,
         //  y: player.y,
@@ -569,7 +606,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     socket.on('draw_Player', function(data) {
 
       var character = new createjs.Sprite(spriteSheet, "down");
-      //console.log($scope[data.stage]);
       var container = $scope[data.container];
       character.x = data.x;
       character.y = data.y;
@@ -580,7 +616,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     })
 
     socket.on('moved', function(data) {
-      //console.log(data.direction);
       var container = $scope[data.container];
       var newPos = container.getChildByName(data.name);
 
@@ -593,14 +628,12 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         });
         if (data.direction != newPos.currentAnimation) {
           newPos.gotoAndPlay(data.direction);
-          // console.log(data.direction);
         }
         stage.update();
 
         onDuck(data);
         if (data.container == "stagingArea") {
           if ((data.x >= 208 && data.x <= 224) && (data.y >= 64 && data.y <= 80)) {
-            //console.log(data.yellow)
             if (data.yellow >= 5) {
               nextLevel(data, "levelOne", "#d5d5d5");
             } else {
@@ -623,9 +656,12 @@ angular.module('gameCtrl', ['gameService', 'authService'])
               moreDucks(data.pink, 30 - data.pink, "pink");
             }
           }
+        } else {
+          if ((data.x >= 420 && data.x <= 440) && (data.y >= 50 && data.y <= 65)) {
+            backLevel(data, data.container);
+          }
         }
         if (vm.username == data.name && stage.getChildAt(1).name != "stagingArea") {
-          console.log(data);
           container.regX = data.x;
           container.regY = data.y;
 
@@ -634,9 +670,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         var animation = "attack" + data.direction;
         newPos.gotoAndPlay(animation);
         if (data.intersect) {
-          console.log(data.hitPlayer);
           var score = (data.hitPlayer.yellow * 1) + (data.hitPlayer.green * 2) + (data.hitPlayer.pink * 3) + (data.hitPlayer.blue * 4);
-
 
           if (data.hitPlayer.name == vm.username) {
             systemMessage({
@@ -693,7 +727,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
 
     function nextLevel(data, level, colour) {
-      console.log(colour);
       socket.emit('moveLevel', {
         //  x: player.x,
         //  y: player.y,
@@ -706,23 +739,39 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       });
     }
 
+    function backLevel(data, level) {
+      socket.emit('moveLevel', {
+        //  x: player.x,
+        //  y: player.y,
+        name: data.name,
+        x: Math.floor(Math.random() * 100) + 20,
+        y: 60,
+        newLevel: "stagingArea",
+        oldLevel: level,
+        col: "#3abe40"
+      });
+    }
+
+
     socket.on('movedLevel', function(data) {
       backFill.style = data.col;
       var newLevel = $scope[data.newLevel];
       var oldLevel = $scope[data.oldLevel];
       var playerToMove = oldLevel.getChildByName(data.name) || newLevel.getChildByName(data.name);
-      //console.log(oldLevel);
-      //console.log(playerToMove)
-      //console.log(data);
+
       playerToMove.x = data.x;
       playerToMove.y = data.y;
       oldLevel.removeChild(playerToMove);
       newLevel.addChild(playerToMove);
       playerToMove.x = data.x;
       playerToMove.y = data.y;
-      //  console.log(playerToMove);
-      newLevel.regX = playerToMove.x;
-      newLevel.regY = playerToMove.y;
+      // newLevel.regX = playerToMove.x;
+      // newLevel.regY = playerToMove.y;
+
+      if (data.newLevel == "stagingArea") {
+        newLevel.regX = 0;
+        newLevel.regY = 0;
+      }
       stage.removeChildAt(1);
       stage.addChild(newLevel);
       stage.update();
@@ -731,7 +780,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     function onDuck(data) {
       var container = $scope[data.container];
       var obj = container.getObjectsUnderPoint(data.x + 8, data.y + 16);
-      //console.log(obj);
       if (obj[1] && obj[1].image) {
         socket.emit('removeDuck', {
           //  x: player.x,
@@ -746,7 +794,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     socket.on('removeDuck', function(data) {
       var container = $scope[data.container];
       var duck = container.getChildByName(data.id);
-      //  console.log(duck);
       container.removeChild(duck);
 
       var score = (data.yellow * 1) + (data.green * 2) + (data.pink * 3) + (data.blue * 4);
@@ -788,24 +835,19 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       Chat.create(vm.gameData)
         .then(function(data) {
           vm.gameData = {}
-          console.log(data);
           socket.emit('send message', data);
         });
 
     }
 
-
-
     socket.on('new message', function(data) {
-
       Chat.all()
         .then(function(data) {
-          // bind the messages that come back to vm.users
           vm.messages = data.data;
         });
     });
 
-    // check to see if a user is logged in on every request
+
     $scope.$on('$locationChangeStart', function() {
       socket.emit('deletePlayer', {
         name: vm.username,
