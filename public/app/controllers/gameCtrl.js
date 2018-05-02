@@ -754,7 +754,6 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
 
     socket.on('movedLevel', function(data) {
-      backFill.style = data.col;
       var newLevel = $scope[data.newLevel];
       var oldLevel = $scope[data.oldLevel];
       var playerToMove = oldLevel.getChildByName(data.name) || newLevel.getChildByName(data.name);
@@ -772,9 +771,13 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         newLevel.regX = 0;
         newLevel.regY = 0;
       }
-      stage.removeChildAt(1);
-      stage.addChild(newLevel);
+      if (data.name == vm.username) {
+        backFill.style = data.col;
+        stage.removeChildAt(1);
+        stage.addChild(newLevel);
+      }
       stage.update();
+
     })
 
     function onDuck(data) {
