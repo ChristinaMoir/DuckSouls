@@ -66,9 +66,7 @@ duckCount.set("levelThree", []);
 
 // io.sockets.on('connection', socket);
 io.on('connection', function(socket) {
-  // console.log("user connected");
   players.forEach(function(item, key, mapObj) {
-    // console.log(item)
     socket.emit('draw_Player', {
       x: item.x,
       y: item.y,
@@ -78,7 +76,6 @@ io.on('connection', function(socket) {
     })
   });
   duckCount.forEach(function(item, key, mapObj) {
-    // console.log(item);
     for (var i = 0; i < item.length; i++) {
       io.sockets.emit('addDuck', {
         x: item[i][0],
@@ -87,8 +84,6 @@ io.on('connection', function(socket) {
       });
     }
   });
-
-
 
   // add handler for message type "draw_line".
   socket.on('draw_Player', function(data) {
@@ -107,7 +102,6 @@ io.on('connection', function(socket) {
         score: data.score
       });
     }
-    console.log(players.get(data.name))
     // send line to all clients
     io.emit('draw_Player', {
       x: data.x,
@@ -149,7 +143,6 @@ io.on('connection', function(socket) {
   socket.on('deletePlayer', function(data) {
     players.delete(data.name);
     io.sockets.emit('player:left', data);
-
   });
 
   socket.on('removeDuck', function(data) {
@@ -165,15 +158,12 @@ io.on('connection', function(socket) {
       player.blue += 1;
     }
 
-    // console.log(players.get(data.name))
     for (var i = 0; i < duckCount.get(data.container).length; i++) {
-      // console.log(duckCount.get(data.container)[i][2])
-      // console.log(data.id);
       if (duckCount.get(data.container)[i][2] == data.id) {
-        // console.log("true");
         duckCount.get(data.container).splice(i, 1);
       }
     }
+
     io.sockets.emit('removeDuck', {
       container: data.container,
       id: data.id,
@@ -208,9 +198,6 @@ io.on('connection', function(socket) {
       return;
     }
 
-
-    //console.log(players);
-
     switch (data.direction) {
       case "left":
         {
@@ -234,7 +221,6 @@ io.on('connection', function(socket) {
         }
     }
     players.forEach(function(item, key, mapObj) {
-      //console.log(item)
       if (item.name != data.name && item.container == data.container) {
         switch (data.direction) {
           case "left":
@@ -270,9 +256,9 @@ io.on('connection', function(socket) {
               break;
             }
         }
-
       }
     });
+
     if (!intersect) {
       playerMoved.x = nextX;
       playerMoved.y = nextY;
@@ -303,7 +289,6 @@ io.on('connection', function(socket) {
       }
     }
 
-    console.log(playerMoved);
     io.sockets.emit('moved', {
       x: playerMoved.x,
       y: playerMoved.y,
@@ -335,6 +320,8 @@ io.on('connection', function(socket) {
     players.delete(socket.name);
     console.log(socket.name + ' has disconnected from the chat.' + socket.id);
   });
+
+
   socket.on('join', function(name) {
     socket.name = name;
     console.log(socket.name + ' joined the chat.');
