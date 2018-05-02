@@ -1,6 +1,10 @@
 angular.module('gameCtrl', ['gameService', 'authService'])
 
   .controller('gameController', function($scope, Auth, Chat, User, $rootScope, $window, AuthToken) {
+
+    /////////////// Initialisation ////////////////
+
+    //Initialise variables
     var vm = this;
     vm.username = "";
     vm.userID = "";
@@ -10,13 +14,13 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     //Background
     var grass = new createjs.Shape();
     var backFill = grass.graphics.beginFill('#3abe40').command;
-
     grass.graphics.drawRect(0, 0, stage.canvas.width, stage.canvas.height);
     grass.graphics.endFill();
     grass.name = "Walkable";
 
     stage.addChild(grass);
-    //container for world
+
+    //Create containers for each level
     var stagingArea = $scope.stagingArea = new createjs.Container();
     stagingArea.name = "stagingArea";
 
@@ -35,21 +39,10 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     levelThree.x = 0;
     levelThree.y = 0;
 
+    //start at the staging area
     stage.addChild(stagingArea)
 
-    function handleImageLoad() {
-      var data = event.path[0].data;
-      var image = event.target;
-      var bitmap = new createjs.Bitmap(image);
-      // bitmap.scaleX = 0.1;
-      // bitmap.scaleY = 0.1;
-      bitmap.x = data.x;
-      bitmap.y = data.y;
-      bitmap.name = data.id;
-      var container = $scope[data.container];
-      container.addChild(bitmap);
-    }
-
+    //create font spritesheet
     var fontImg = new Image();
     fontImg.src = "assets/img/font.png";
     var fonts = new createjs.SpriteSheet({
@@ -64,6 +57,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       }
     });
 
+    //create cave spritesheet
     var caveImg = new Image();
     caveImg.src = "assets/img/cave.png";
     var cave = new createjs.SpriteSheet({
@@ -78,6 +72,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       }
     });
 
+    //create standard world spritesheet
     var image = new Image();
     image.src = "assets/img/Overworld.png";
     var ss = new createjs.SpriteSheet({
@@ -112,12 +107,13 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       }
     });
 
-    var girl = new Image();
-    girl.src = "assets/img/character.png";
+    //Create character spritesheet
+    var char = new Image();
+    char.src = "assets/img/character.png";
     // create spritesheet and assign the associated data.
     var spriteSheet = new createjs.SpriteSheet({
       // image to use
-      images: [girl],
+      images: [char],
       framerate: 4,
       // width, height & registration point of each sprite
       frames: [
@@ -239,33 +235,10 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     });
 
-
-
-    //createjs.Ticker.setFPS(30);
+    //create game loop
     createjs.Ticker.on("tick", tick);
 
-    function tick(event) {
-      var rand = Math.random() * 1000;
-      if (rand > 990) {
-        var randX = Math.floor(Math.random() * stage.canvas.width);
-        var randY = Math.floor(Math.random() * stage.canvas.height);
-        var container = stage.getChildAt(1);
-        if (!container.getObjectUnderPoint(randX, randY) || container.getObjectUnderPoint(randX, randY).name == "Walkable") {
-          socket.emit('addDuck', {
-            //  x: player.x,
-            //  y: player.y,
-            x: randX,
-            y: randY,
-            container: container.name
-          });
-        }
-
-      }
-      stage.update(event);
-    }
-
-
-
+    //initialise and draw the staging area
     $.getJSON("assets/maps/stagingArea.json", function(data) {
 
       $.each(data.layers, function(key, val) {
@@ -288,6 +261,8 @@ angular.module('gameCtrl', ['gameService', 'authService'])
             count++;
           }
         }
+
+        //add level numbers to staging area
         var tile = new createjs.Sprite(fonts);
         tile.gotoAndStop(180);
         tile.x = 192;
@@ -383,6 +358,8 @@ angular.module('gameCtrl', ['gameService', 'authService'])
         stagingArea.addChild(tile);
 
       });
+
+      //animate waterfall
       var waterfallLeft = new createjs.Sprite(ss);
       waterfallLeft.gotoAndPlay("waterfallStartLeft");
       waterfallLeft.x = 608;
@@ -418,6 +395,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     })
 
+    //initialise and draw level one
     $.getJSON("assets/maps/levelOne.json", function(data) {
 
       $.each(data.layers, function(key, val) {
@@ -443,6 +421,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       });
     });
 
+    //initialise and draw level two
     $.getJSON("assets/maps/levelTwo.json", function(data) {
 
       $.each(data.layers, function(key, val) {
@@ -468,6 +447,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       });
     });
 
+    //initialise and draw level three
     $.getJSON("assets/maps/levelThree.json", function(data) {
 
       $.each(data.layers, function(key, val) {
@@ -495,14 +475,13 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     // update the stage to draw to screen:
     stage.update();
-
-
-    //makes lines sharper
-    // stage.regX = -0.5;
-    // stage.regY = -0.5;
+    // create new socket connection
     var socket = io.connect();
+
+    //put focus on canvas so players can instantly move
     $('#gameCanvas').focus();
 
+    //initalise user and draw them on the canvas
     Auth.getUser()
       .then(function(data) {
         vm.username = data.data.username;
@@ -539,6 +518,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       event.target.focus();
     }
 
+    //Move player on keypress
     vm.move = function(event) {
       event.preventDefault();
       var currStage = stage.getChildAt(1).name;
@@ -581,6 +561,135 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     }
 
+    //Send message to chat
+    vm.newMessage = function() {
+      vm.gameData.username = vm.username;
+      Chat.create(vm.gameData)
+        .then(function(data) {
+          vm.gameData = {}
+          socket.emit('send message', data);
+        });
+    }
+
+
+    /////////////// Game functions ////////////////
+
+    //Add duck image to canvas
+    function handleImageLoad() {
+      var data = event.path[0].data;
+      var image = event.target;
+      var bitmap = new createjs.Bitmap(image);
+      // bitmap.scaleX = 0.1;
+      // bitmap.scaleY = 0.1;
+      bitmap.x = data.x;
+      bitmap.y = data.y;
+      bitmap.name = data.id;
+      var container = $scope[data.container];
+      container.addChild(bitmap);
+    }
+
+    //game loop
+    function tick(event) {
+      var rand = Math.random() * 1000;
+      if (rand > 990) {
+        var randX = Math.floor(Math.random() * stage.canvas.width);
+        var randY = Math.floor(Math.random() * stage.canvas.height);
+        var container = stage.getChildAt(1);
+        if (!container.getObjectUnderPoint(randX, randY) || container.getObjectUnderPoint(randX, randY).name == "Walkable") {
+          socket.emit('addDuck', {
+            //  x: player.x,
+            //  y: player.y,
+            x: randX,
+            y: randY,
+            container: container.name
+          });
+        }
+
+      }
+      stage.update(event);
+    }
+
+    //alert the player if they dont have enough ducks to go to a level
+    function moreDucks(numDucks, missingDucks, colour) {
+      alert("You have " + numDucks + " " + colour + " ducks. You need " + missingDucks + " more to access this level.");
+    }
+
+    //check if the next space is walkable for a player
+    function nonWalkable(player, container, x, y, direction) {
+
+      if (direction == "left") {
+        var obj = container.getObjectsUnderPoint(x, y + 16);
+      } else if (direction == "right") {
+        var obj = container.getObjectsUnderPoint(x + 8, y + 16);
+      } else if (direction == "up") {
+        var obj = container.getObjectsUnderPoint(x + 4, y);
+      } else if (direction == "down") {
+        var obj = container.getObjectsUnderPoint(x + 4, y + 21);
+      }
+
+      if ((obj[0] && obj[0].name == "Base") || (obj[1] && obj[1].name == "Base") || (obj[2] && obj[2].name == "Base")) {
+        return true;
+      } else {
+        return false;
+      }
+
+
+    }
+
+    //move a player to a level
+    function nextLevel(data, level, colour) {
+      socket.emit('moveLevel', {
+        //  x: player.x,
+        //  y: player.y,
+        name: data.name,
+        x: Math.floor(Math.random() * 100) + 20,
+        y: 40,
+        newLevel: level,
+        oldLevel: "stagingArea",
+        col: colour
+      });
+    }
+
+    // move a player from a level back to the staging area
+    function backLevel(data, level) {
+      socket.emit('moveLevel', {
+        //  x: player.x,
+        //  y: player.y,
+        name: data.name,
+        x: Math.floor(Math.random() * 100) + 20,
+        y: 60,
+        newLevel: "stagingArea",
+        oldLevel: level,
+        col: "#3abe40"
+      });
+    }
+
+    //check if duck is under player and remove if so
+    function onDuck(data) {
+      var container = $scope[data.container];
+      var obj = container.getObjectsUnderPoint(data.x + 8, data.y + 16);
+      if (obj[1] && obj[1].image) {
+        socket.emit('removeDuck', {
+          //  x: player.x,
+          //  y: player.y,
+          name: data.name,
+          container: data.container,
+          id: obj[1].name
+        });
+      }
+    }
+
+    //add system message to database and update chatbox
+    function systemMessage(data) {
+      Chat.create(data)
+        .then(function(data) {
+          socket.emit('send message', data);
+        });
+    }
+
+    /////////////// Socket functions ////////////////
+
+    //Add duck image to canvas
     socket.on('addDuck', function(data) {
       var duck = new Image();
       if (data.container == "stagingArea") {
@@ -603,6 +712,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       duck.onload = handleImageLoad;
     })
 
+    // Draw player
     socket.on('draw_Player', function(data) {
 
       var character = new createjs.Sprite(spriteSheet, "down");
@@ -615,6 +725,8 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     })
 
+    //Move player, check if on duck or level change area.
+    //Check if attacked and update players score and add message to chat
     socket.on('moved', function(data) {
       var container = $scope[data.container];
       var newPos = container.getChildByName(data.name);
@@ -700,100 +812,9 @@ angular.module('gameCtrl', ['gameService', 'authService'])
 
     });
 
-    function moreDucks(numDucks, missingDucks, colour) {
-      alert("You have " + numDucks + " " + colour + " ducks. You need " + missingDucks + " more to access this level.");
-    }
-
-    function nonWalkable(player, container, x, y, direction) {
-
-      if (direction == "left") {
-        var obj = container.getObjectsUnderPoint(x, y + 16);
-      } else if (direction == "right") {
-        var obj = container.getObjectsUnderPoint(x + 8, y + 16);
-      } else if (direction == "up") {
-        var obj = container.getObjectsUnderPoint(x + 4, y);
-      } else if (direction == "down") {
-        var obj = container.getObjectsUnderPoint(x + 4, y + 21);
-      }
-
-      if ((obj[0] && obj[0].name == "Base") || (obj[1] && obj[1].name == "Base") || (obj[2] && obj[2].name == "Base")) {
-        return true;
-      } else {
-        return false;
-      }
 
 
-    }
-
-
-    function nextLevel(data, level, colour) {
-      socket.emit('moveLevel', {
-        //  x: player.x,
-        //  y: player.y,
-        name: data.name,
-        x: Math.floor(Math.random() * 100) + 20,
-        y: 40,
-        newLevel: level,
-        oldLevel: "stagingArea",
-        col: colour
-      });
-    }
-
-    function backLevel(data, level) {
-      socket.emit('moveLevel', {
-        //  x: player.x,
-        //  y: player.y,
-        name: data.name,
-        x: Math.floor(Math.random() * 100) + 20,
-        y: 60,
-        newLevel: "stagingArea",
-        oldLevel: level,
-        col: "#3abe40"
-      });
-    }
-
-
-    socket.on('movedLevel', function(data) {
-      var newLevel = $scope[data.newLevel];
-      var oldLevel = $scope[data.oldLevel];
-      var playerToMove = oldLevel.getChildByName(data.name) || newLevel.getChildByName(data.name);
-
-      playerToMove.x = data.x;
-      playerToMove.y = data.y;
-      oldLevel.removeChild(playerToMove);
-      newLevel.addChild(playerToMove);
-      playerToMove.x = data.x;
-      playerToMove.y = data.y;
-      // newLevel.regX = playerToMove.x;
-      // newLevel.regY = playerToMove.y;
-
-      if (data.newLevel == "stagingArea") {
-        newLevel.regX = 0;
-        newLevel.regY = 0;
-      }
-      if (data.name == vm.username) {
-        backFill.style = data.col;
-        stage.removeChildAt(1);
-        stage.addChild(newLevel);
-      }
-      stage.update();
-
-    })
-
-    function onDuck(data) {
-      var container = $scope[data.container];
-      var obj = container.getObjectsUnderPoint(data.x + 8, data.y + 16);
-      if (obj[1] && obj[1].image) {
-        socket.emit('removeDuck', {
-          //  x: player.x,
-          //  y: player.y,
-          name: data.name,
-          container: data.container,
-          id: obj[1].name
-        });
-      }
-    }
-
+    //remove duck and update players score in database
     socket.on('removeDuck', function(data) {
       var container = $scope[data.container];
       var duck = container.getChildByName(data.id);
@@ -818,6 +839,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       }
     })
 
+    //remove player
     socket.on('player:left', function(data) {
       var container = $scope[data.container];
       var left = container.getChildByName(data.name);
@@ -825,24 +847,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
       stage.update();
     })
 
-
-    function systemMessage(data) {
-      Chat.create(data)
-        .then(function(data) {
-          socket.emit('send message', data);
-        });
-    }
-
-    vm.newMessage = function() {
-      vm.gameData.username = vm.username;
-      Chat.create(vm.gameData)
-        .then(function(data) {
-          vm.gameData = {}
-          socket.emit('send message', data);
-        });
-
-    }
-
+    //update messages
     socket.on('new message', function(data) {
       Chat.all()
         .then(function(data) {
@@ -851,6 +856,7 @@ angular.module('gameCtrl', ['gameService', 'authService'])
     });
 
 
+    //Check if player moves away from play page and remove them if so
     $scope.$on('$locationChangeStart', function() {
       socket.emit('deletePlayer', {
         name: vm.username,
